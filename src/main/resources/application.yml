@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: task-manager
+  profiles:
+    active: dynamodb # Override with env var: SPRING_PROFILES_ACTIVE=dynamodb
+
+server:
+  port: 5000
+---
+# note: the spring.config.activate.on-profile applies a specific section of config only if a profile si active.
+#       spring.profiles.active activates a profile (indicates which profile to load)
+spring:
+  config:
+    activate:
+      on-profile: rds
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dynamodb
+
+aws:
+  region: us-east-1
+  dynamodb:
+    table-name: tasks-dynamodb
+
+logging:
+  level:
+    software.amazon.awssdk: WARN
+
+
+## Test locally using H2
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  h2:
+#    console:
+#      enabled: true
